@@ -5,8 +5,10 @@ use axum::{
 };
 
 mod handlers;
+mod db;
 
 use handlers::{user, todo};
+use db::connection::connect_db;
 
 #[tokio::main]
 async fn main(){
@@ -20,6 +22,8 @@ async fn main(){
     .route("/todo/:id", delete(todo::deleteTodo))
     .route("/todo/:id", put(todo::updateTodo));
 
+    connect_db().await;
+    println!("connected db successfully ");
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
