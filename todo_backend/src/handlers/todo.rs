@@ -1,13 +1,12 @@
 
-use axum::extract::{Json, Path};
+use axum::extract::{Json,State, Path, Extension};
 use serde::{Deserialize, Serialize};
 
+use crate::app_state::AppState;
 
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TodoData {
-    pub id : i32,
-    pub user_id: i32,
     pub title: String,
     pub description: String,
     pub tag: String
@@ -18,8 +17,8 @@ pub async fn getalltodo()-> String{
 }
 
 // so here this userdata is like a type that tell code that this json will be give data like this userdata  
-pub async  fn createTodo(Json(todo): Json<TodoData>)-> String{
-    println!("todo is : {:?}", todo );
+pub async  fn createTodo(State(state): State<AppState>, Json(todo): Json<TodoData>, Extension(user_id): Extension<i32>)-> String{
+    println!("todo is : {:?},  userid is :{}", todo, user_id );
     // do the db creation of the todo 
     format!("Created todo: {}", todo.title)
 } 
