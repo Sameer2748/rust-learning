@@ -24,11 +24,11 @@ async fn main(){
     
     let protected_routes = Router::new()
     .route("/getall", get(todo::getalltodo))
-    .route("/create", post(todo::createTodo))
+    .route("/create", post(todo::create_Todo))
     .route("/todo/:id", get(todo::getTodo))
     .route("/todo/:id", delete(todo::deleteTodo))
     .route("/todo/:id", put(todo::updateTodo))
-    .layer(middleware::from_fn(auth_middleware)); // layer help us add the middleware trait in this router and in that we ahve from_fn which take our middleware funtion 
+    .layer(middleware::from_fn(auth_middleware)).with_state(state.clone()); // layer help us add the middleware trait in this router and in that we ahve from_fn which take our middleware funtion 
 
     let app = Router::new()
         .route("/", get(|| async {"hello from backend"}))
