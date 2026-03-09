@@ -10,10 +10,13 @@ pub struct ChatRoom {
     pub history: Vec<ChatMessage>,
     pub participants: Vec<User>,
     // now then transmitter
-    #[serde(skip)]
-    pub tx: broadcast::Sender<ChatMessage>,
+    // okk now we dont need local transmitter redis will handle it 
+    // #[serde(skip)]
+    // pub tx: broadcast::Sender<ChatMessage>,
 }
+
+use deadpool_redis::Pool;
 #[derive(Debug)]
-pub struct AppState {
-    pub rooms: HashMap<String, ChatRoom>,
+pub struct AppState{
+    pub redis_pool : Pool
 }
