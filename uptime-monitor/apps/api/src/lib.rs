@@ -3,13 +3,19 @@ pub mod middleware;
 pub mod jwt;
 
 use axum::middleware::from_fn;
-use axum::{routing::{get, post}, Router};
+use axum::{routing::{get, post, delete, put}, Router};
 use sqlx::PgPool;
 use std::net::SocketAddr;
+use serde::Deserialize;
 
 use crate::middleware::checker::auth_middleware;
 use crate::handlers::{auth, monitor};
 
+
+#[derive(Deserialize)]
+pub struct PausePayload {
+    pub paused: bool, 
+}
 
 //state so we can use the pool
 #[derive(Clone)]
@@ -23,7 +29,10 @@ pub async fn run_server(pool: PgPool){
 
     let protected_routes = Router::new()
      .route("/monitor", post(monitor::create_monitor))
-        // .route("/", get(monitor::list_monitors))
+     .route("/monitor", get(monitor::getAllMonitor))
+        .route("/monitor/:website_id", get(monitor::getMonitorById))
+        .route("/monitor/:website_id", delete(monitor::deleteMonitor))
+        .route("/monitor/:website_id", put(monitor::toggleMonitor))
     .layer(from_fn(auth_middleware)).with_state(state.clone()); // layer help us add the middleware trait in this router and in that we ahve from_fn which take our middleware funtion 
 
    
