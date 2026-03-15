@@ -29,7 +29,7 @@ pub async fn create_monitor(
         "#,
         user_id,
         payload.url,
-        payload.period
+        payload.period.as_seconds()
     )
     .fetch_one(&state.db)
     .await;

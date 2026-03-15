@@ -66,8 +66,24 @@ pub struct UserResponse {
     pub name: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum CheckPeriod {
+    OneMin,
+    ThreeMin,
+}
+
+impl CheckPeriod {
+    pub fn as_seconds(&self) -> i32 {
+        match self {
+            CheckPeriod::OneMin => 60,
+            CheckPeriod::ThreeMin => 180,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateMonitorRequest {
     pub url: String,
-    pub period: i32,
+    pub period: CheckPeriod,
 }
