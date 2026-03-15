@@ -4,3 +4,9 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+tokio = { version = "1.37", features = ["full"] }
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "uuid", "chrono"] }
+dotenv = "0.15"
+common = { path = "../../packages/common" }
+redis = { version = "0.24.0", features = ["aio", "tokio-comp"] }
+chrono = "0.4.44"
