@@ -4,6 +4,7 @@ use sqlx::{FromRow, Type};
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize, Type, Clone, Copy, PartialEq)]
+#[sqlx(type_name = "website_status", rename_all = "lowercase")]
 pub enum WebsiteStatus {
     Up,
     Down,
