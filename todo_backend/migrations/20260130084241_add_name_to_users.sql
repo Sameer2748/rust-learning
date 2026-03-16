@@ -1,3 +1,0 @@
--- Add migration script here
-ALTER TABLE users
-ADD COLUMN name TEXT NOT NULL DEFAULT '';
