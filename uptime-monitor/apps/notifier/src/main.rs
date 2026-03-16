@@ -67,15 +67,80 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 // 3. Send Notification (Simulated)
                 println!(
-                    "🔔 ALERT for {}: {} status changed from {} to {}! Sending email to {} ({})",
-                    user_data.name, url, old_status, new_status, user_data.email, user_data.name
+                    "🔔 Sending email alert for {}: {} status changed from {} to {}!",
+                    user_data.name, url, old_status, new_status
                 );
                 
-                // In a real app, you'd use a crate like `lettre` or an API like SendGrid/resend here.
+                let api_key = env::var("BREVO_API_KEY").expect("BREVO_API_KEY must be set");
+                let res = send_email(&api_key, &user_data.email, &user_data.name, &url, &new_status).await;
+
+                match res {
+                    Ok(_) => println!("✅ Email sent successfully to {}", user_data.email),
+                    Err(e) => eprintln!("❌ Failed to send email: {:?}", e),
+                }
                 
                 // 4. Acknowledge
                 let _: () = redis_con.xack(stream_name, group_name, &[&message.id]).await?;
             }
         }
+    }
+}
+
+async fn send_email(
+    api_key: &str,
+    to_email: &str,
+    to_name: &str,
+    url: &str,
+    status: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let client = reqwest::Client::new();
+    
+    let subject = if status == "Up" {
+        format!("🟢 Recovery: {} is UP", url)
+    } else {
+        format!("🚨 Alert: {} is DOWN", url)
+    };
+
+    let color = if status == "Up" { "#10b981" } else { "#ef4444" };
+
+    let html_content = format!(
+        r#"
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; max-width: 600px;">
+            <h2 style="color: {color};">Website Status Change</h2>
+            <p>Your monitor for <strong>{url}</strong> has changed status to <strong>{status}</strong>.</p>
+            <div style="background: #f1f5f9; padding: 15px; border-radius: 4px; margin: 20px 0;">
+                <strong>Status:</strong> {status}<br/>
+                <strong>Time:</strong> {time}
+            </div>
+            <p>Check your dashboard for more details.</p>
+            <a href="http://localhost:3000/dashboard" style="display: inline-block; background: #000; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 6px;">View Dashboard</a>
+        </div>
+        "#,
+        color = color,
+        url = url,
+        status = status,
+        time = chrono::Utc::now().to_rfc2822()
+    );
+
+    let payload = serde_json::json!({
+        "sender": { "name": "NightWatch Alerts", "email": "mrao27488@gmail.com" },
+        "to": [{ "email": to_email, "name": to_name }],
+        "subject": subject,
+        "htmlContent": html_content
+    });
+
+    let response = client
+        .post("https://api.brevo.com/v3/smtp/email")
+        .header("api-key", api_key)
+        .header("Content-Type", "application/json")
+        .json(&payload)
+        .send()
+        .await?;
+
+    if response.status().is_success() {
+        Ok(())
+    } else {
+        let err_text = response.text().await?;
+        Err(format!("Brevo API error: {}", err_text).into())
     }
 }
