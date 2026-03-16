@@ -32,7 +32,7 @@ pub async fn signup(
                  email: data.email,
                  name: data.name,
             };
-             let response = getDetails(user_resp).await;
+             let response = get_details(user_resp).await;
             (StatusCode::CREATED, Json(response)).into_response()
         },
         Err(_)=> (StatusCode::CONFLICT, "user already exists").into_response()
@@ -57,7 +57,7 @@ pub async fn signin(
                  email: user_db.email,
                  name: user_db.name,
             };
-                 let response = getDetails(user_resp).await;
+                 let response = get_details(user_resp).await;
                 (StatusCode::OK, Json(response)).into_response()
             }else {
                 (StatusCode::UNAUTHORIZED, "Invalid credentials").into_response()
@@ -69,7 +69,7 @@ pub async fn signin(
 
 }
 
-async fn getDetails(data:UserResponse)-> AuthResponse{
+async fn get_details(data:UserResponse)-> AuthResponse{
     let token = create_token(data.id).await;
     let user = UserResponse {id:data.id, email: data.email, name: data.name};
     AuthResponse {token , user}

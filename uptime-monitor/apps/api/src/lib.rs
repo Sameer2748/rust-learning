@@ -29,10 +29,10 @@ pub async fn run_server(pool: PgPool){
 
     let protected_routes = Router::new()
      .route("/monitor", post(monitor::create_monitor))
-     .route("/monitor", get(monitor::getAllMonitor))
-        .route("/monitor/:website_id", get(monitor::getMonitorById))
-        .route("/monitor/:website_id", delete(monitor::deleteMonitor))
-        .route("/monitor/:website_id", put(monitor::toggleMonitor))
+      .route("/monitor", get(monitor::get_all_monitors))
+        .route("/monitor/:website_id", get(monitor::get_monitor_by_id))
+        .route("/monitor/:website_id", delete(monitor::delete_monitor))
+        .route("/monitor/:website_id", put(monitor::toggle_monitor))
     .layer(from_fn(auth_middleware)).with_state(state.clone()); // layer help us add the middleware trait in this router and in that we ahve from_fn which take our middleware funtion 
 
    

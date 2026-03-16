@@ -47,7 +47,7 @@ pub async fn create_monitor(
 
 }
 
-pub async fn getAllMonitor( State(state): State<AppState>,
+pub async fn get_all_monitors( State(state): State<AppState>,
     Extension(user_id): Extension<Uuid>,) -> impl IntoResponse
 {
     // Fix missing comma after user_id and added created_at!, paused!
@@ -73,7 +73,7 @@ pub async fn getAllMonitor( State(state): State<AppState>,
     }
 }
 
-pub async fn getMonitorById( State(state): State<AppState>,
+pub async fn get_monitor_by_id( State(state): State<AppState>,
     Extension(user_id): Extension<Uuid>,
      Path(website_id): Path<Uuid>,)-> impl IntoResponse{
  // Fix missing comma after user_id and added created_at!, paused!
@@ -100,7 +100,7 @@ pub async fn getMonitorById( State(state): State<AppState>,
         }
     }
 }
-pub async fn toggleMonitor(
+pub async fn toggle_monitor(
     State(state): State<AppState>,
     Extension(user_id): Extension<Uuid>,
     Path(website_id): Path<Uuid>,
@@ -129,7 +129,7 @@ pub async fn toggleMonitor(
     }
 }
 
-pub async fn deleteMonitor( State(state): State<AppState>,
+pub async fn delete_monitor( State(state): State<AppState>,
     Extension(user_id): Extension<Uuid>,
     Path(website_id): Path<Uuid>,)-> impl IntoResponse{
 
